@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#111827" />
+  <meta name="description" content="Controle diário de visitas técnicas e vistorias pós-montagem." />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>Visitas Técnicas</title>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <span class="eyebrow">CONTROLE OPERACIONAL</span>
+      <h1>Visitas Técnicas</h1>
+    </div>
+    <button id="installBtn" class="ghost hidden" type="button">Instalar</button>
+  </header>
+
+  <nav class="tabs" aria-label="Navegação principal">
+    <button class="tab active" data-view="formView">Nova visita</button>
+    <button class="tab" data-view="historyView">Histórico</button>
+  </nav>
+
+  <main>
+    <section id="formView" class="view active">
+      <form id="visitForm">
+        <section class="card">
+          <div class="card-title">
+            <h2>Identificação</h2>
+            <span id="visitNumber" class="badge"></span>
+          </div>
+
+          <div class="grid two">
+            <label>Data
+              <input id="date" name="date" type="date" required />
+            </label>
+            <label>Tipo de atendimento
+              <select id="serviceType" name="serviceType" required>
+                <option value="">Selecione</option>
+                <option>Assistência técnica</option>
+                <option>Vistoria pós-montagem</option>
+                <option>Entrega complementar</option>
+                <option>Garantia</option>
+                <option>Outro</option>
+              </select>
+            </label>
+            <label>Nome do vistoriador
+              <input id="inspectorName" name="inspectorName" type="text" autocomplete="name" required />
+            </label>
+            <label>Equipe / montador
+              <input id="team" name="team" type="text" />
+            </label>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Cliente e contrato</h2>
+          <div class="grid two">
+            <label>Nome do cliente
+              <input id="clientName" name="clientName" type="text" required />
+            </label>
+            <label>Contrato
+              <input id="contract" name="contract" type="text" required />
+            </label>
+            <label class="span-2">Endereço
+              <input id="address" name="address" type="text" required />
+            </label>
+            <label>Telefone
+              <input id="phone" name="phone" type="tel" inputmode="tel" />
+            </label>
+            <label>Ambiente
+              <select id="environment" name="environment">
+                <option value="">Selecione</option>
+                <option>Cozinha</option><option>Gourmet</option><option>Lavanderia</option>
+                <option>Sala / Home</option><option>Dormitório</option><option>Closet</option>
+                <option>Banheiro</option><option>Escritório</option><option>Comercial</option><option>Outro</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Deslocamento e horários</h2>
+          <div class="grid two">
+            <label>Origem
+              <input id="origin" name="origin" type="text" required />
+            </label>
+            <label>Destino
+              <input id="destination" name="destination" type="text" required />
+            </label>
+            <label>Horário de saída da origem
+              <input id="originTime" name="originTime" type="time" required />
+            </label>
+            <label>Hora de entrada no destino
+              <input id="arrivalTime" name="arrivalTime" type="time" required />
+            </label>
+            <label>Hora de saída do destino
+              <input id="departureTime" name="departureTime" type="time" required />
+            </label>
+            <label>Horário de retorno à origem
+              <input id="returnTime" name="returnTime" type="time" />
+            </label>
+            <label>Quilometragem inicial
+              <input id="kmStart" name="kmStart" type="number" inputmode="decimal" min="0" step="0.1" required />
+            </label>
+            <label>Quilometragem final
+              <input id="kmEnd" name="kmEnd" type="number" inputmode="decimal" min="0" step="0.1" required />
+            </label>
+          </div>
+          <div class="metrics">
+            <div><span>KM percorridos</span><strong id="kmTotal">0,0 km</strong></div>
+            <div><span>Tempo de atendimento</span><strong id="serviceDuration">0h 00min</strong></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Motivo da visita</h2>
+          <div class="checks">
+            <label><input type="checkbox" name="reason" value="Regulagem"> Regulagem</label>
+            <label><input type="checkbox" name="reason" value="Ajuste"> Ajuste</label>
+            <label><input type="checkbox" name="reason" value="Troca de peça"> Troca de peça</label>
+            <label><input type="checkbox" name="reason" value="Acabamento"> Acabamento</label>
+            <label><input type="checkbox" name="reason" value="Ferragens"> Ferragens</label>
+            <label><input type="checkbox" name="reason" value="Iluminação"> Iluminação</label>
+            <label><input type="checkbox" name="reason" value="Conferência final"> Conferência final</label>
+            <label><input type="checkbox" name="reason" value="Outro"> Outro</label>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Resultado técnico</h2>
+          <label>Itens resolvidos / OK
+            <textarea id="resolvedItems" name="resolvedItems" rows="5" placeholder="Descreva os itens solucionados, testes realizados e orientações dadas ao cliente."></textarea>
+          </label>
+
+          <label>Itens pendentes de materiais
+            <textarea id="materialPending" name="materialPending" rows="5" placeholder="Informe peça, acabamento, medida, código, quantidade e fornecedor, quando aplicável."></textarea>
+          </label>
+
+          <div id="materialsList" class="dynamic-list"></div>
+          <button id="addMaterialBtn" class="secondary" type="button">+ Adicionar material estruturado</button>
+
+          <label>Itens pendentes — outros
+            <textarea id="otherPending" name="otherPending" rows="4" placeholder="Ex.: dependência de terceiro, obra civil, elétrica, pedra, vidro, decisão do cliente."></textarea>
+          </label>
+
+          <label>Observações gerais
+            <textarea id="notes" name="notes" rows="5"></textarea>
+          </label>
+        </section>
+
+        <section class="card">
+          <h2>Retorno e prioridade</h2>
+          <div class="segmented">
+            <label><input type="radio" name="returnRequired" value="Não" checked> Não</label>
+            <label><input type="radio" name="returnRequired" value="Sim"> Sim</label>
+          </div>
+
+          <div id="returnDetails" class="hidden">
+            <div class="grid two">
+              <label>Prioridade
+                <select id="priority" name="priority">
+                  <option value="">Selecione</option>
+                  <option>Alta</option><option>Média</option><option>Baixa</option>
+                </select>
+              </label>
+              <label>Data sugerida
+                <input id="suggestedDate" name="suggestedDate" type="date" />
+              </label>
+              <label class="span-2">Motivo do retorno
+                <textarea id="returnReason" name="returnReason" rows="4"></textarea>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Fotos</h2>
+          <p class="hint">Adicione fotos do antes, durante e depois. As imagens ficam armazenadas no próprio aparelho.</p>
+          <input id="photos" type="file" accept="image/*" capture="environment" multiple />
+          <div id="photoPreview" class="photo-grid"></div>
+        </section>
+
+        <section class="card">
+          <h2>Assinaturas</h2>
+          <div class="signature-block">
+            <div class="signature-head">
+              <span>Assinatura do vistoriador</span>
+              <button class="text-btn" data-clear-signature="inspectorSignature" type="button">Limpar</button>
+            </div>
+            <canvas id="inspectorSignature" class="signature" width="900" height="280"></canvas>
+          </div>
+
+          <div class="signature-block">
+            <div class="signature-head">
+              <span>Assinatura do cliente</span>
+              <button class="text-btn" data-clear-signature="clientSignature" type="button">Limpar</button>
+            </div>
+            <canvas id="clientSignature" class="signature" width="900" height="280"></canvas>
+          </div>
+
+          <label class="consent">
+            <input id="agreement" type="checkbox" required />
+            O cliente acompanhou o atendimento e declara ciência das informações registradas.
+          </label>
+        </section>
+
+        <section class="actions">
+          <button id="saveBtn" class="primary" type="submit">Salvar visita</button>
+          <button id="printCurrentBtn" class="secondary" type="button">Imprimir / Salvar PDF</button>
+          <button id="clearBtn" class="danger" type="button">Limpar formulário</button>
+        </section>
+      </form>
+    </section>
+
+    <section id="historyView" class="view">
+      <section class="card">
+        <div class="card-title">
+          <h2>Histórico de visitas</h2>
+          <button id="exportJsonBtn" class="secondary small" type="button">Exportar backup</button>
+        </div>
+        <input id="historySearch" type="search" placeholder="Buscar por cliente, contrato, técnico ou endereço..." />
+        <div id="historyList" class="history-list"></div>
+      </section>
+    </section>
+  </main>
+
+  <template id="materialTemplate">
+    <div class="material-row">
+      <input data-field="description" placeholder="Descrição / peça" />
+      <input data-field="code" placeholder="Código" />
+      <input data-field="quantity" type="number" min="1" step="1" value="1" placeholder="Qtd." />
+      <button class="icon-btn" data-remove-material type="button" aria-label="Remover material">×</button>
+    </div>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
